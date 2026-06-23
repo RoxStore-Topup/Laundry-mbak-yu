@@ -1,0 +1,376 @@
+# Laundry-mbak-yu
+Tempat laundry wangi dan bersih
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Kasir Laundry</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-content: center;
+            padding: 30px 15px;
+        }
+        .container {
+            background-color: #ffffff;
+            max-width: 500px;
+            width: 100%;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            border: 1px solid #e1e8ed;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #1e88e5;
+            font-size: 24px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #546e7a;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background-color: #f8fafc;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            color: #333;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus, select:focus {
+            border-color: #1e88e5;
+            background-color: #fff;
+        }
+        
+        /* KOTAK SCROLL UNTUK LAYANAN DAN DURASI */
+        .scroll-container {
+            max-height: 150px; /* Membatasi tinggi agar hemat layar */
+            overflow-y: auto;  /* Memunculkan scrollbar jika menu banyak */
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            background-color: #f8fafc;
+            padding: 5px;
+        }
+        .layanan-item, .durasi-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            margin-bottom: 4px;
+            background-color: #fff;
+            border: 1px solid #e1e8ed;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .layanan-item:hover, .durasi-item:hover {
+            background-color: #e3f2fd;
+        }
+        .layanan-item input[type="radio"], .durasi-item input[type="radio"] {
+            width: auto;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        /* Style ketika opsi layanan dikunci/disabled */
+        .layanan-item.disabled {
+            background-color: #eceff1;
+            color: #b0bec5;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .layanan-item.disabled input {
+            cursor: not-allowed;
+        }
+
+        .info-estimasi {
+            font-size: 13px;
+            color: #e65100;
+            font-weight: bold;
+            margin-top: 6px;
+            display: block;
+        }
+        .price-box {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #1e88e5;
+        }
+        .price-box p {
+            font-size: 13px;
+            color: #546e7a;
+        }
+        .price-box .total-harga {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1e88e5;
+            margin-top: 5px;
+        }
+        .btn-order {
+            width: 100%;
+            background-color: #25d366;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 22px;
+            transition: background 0.3s;
+        }
+        .btn-order:hover {
+            background-color: #20ba5a;
+        }
+        .note {
+            font-size: 12px;
+            color: #78909c;
+            margin-top: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Sistem Kasir Laundry</h2>
+    
+    <div class="form-group">
+        <label for="customer-name">Nama Pelanggan :</label>
+        <input type="text" id="customer-name" placeholder="Masukkan nama pelanggan" required>
+    </div>
+
+    <div class="form-group">
+        <label>Jenis Layanan (Scroll ke bawah):</label>
+        <div class="scroll-container">
+            <div class="layanan-item" id="item-cuci" onclick="pilihLayanan('opt-cuci')">
+                <input type="radio" name="laundry_service" id="opt-cuci" value="6000" data-nama="Cuci Komplit (Rp 6.000/kg)" checked onchange="hitungTotal()">
+                <span>Cuci Komplit (Rp 6.000/kg)</span>
+            </div>
+            <div class="layanan-item" id="item-lipat" onclick="pilihLayanan('opt-lipat')">
+                <input type="radio" name="laundry_service" id="opt-lipat" value="5000" data-nama="Cuci Lipat (Rp 5.000/kg)" onchange="hitungTotal()">
+                <span>Cuci Lipat (Rp 5.000/kg)</span>
+            </div>
+            <div class="layanan-item" id="item-setrika" onclick="pilihLayanan('opt-setrika')">
+                <input type="radio" name="laundry_service" id="opt-setrika" value="4000" data-nama="Setrika Saja (Rp 4.000/kg)" onchange="hitungTotal()">
+                <span>Setrika Saja (Rp 4.000/kg)</span>
+            </div>
+            <div class="layanan-item" id="item-mukena" onclick="pilihLayanan('opt-mukena')">
+                <input type="radio" name="laundry_service" id="opt-mukena" value="3000" data-nama="Mukena (Rp 3.000/pcs)" onchange="hitungTotal()">
+                <span>Mukena (Rp 3.000/pcs)</span>
+            </div>
+            <div class="layanan-item" id="item-sepatu" onclick="pilihLayanan('opt-sepatu')">
+                <input type="radio" name="laundry_service" id="opt-sepatu" value="15000" data-nama="Sepatu (Rp 15.000/pasang)" onchange="hitungTotal()">
+                <span>Sepatu (Rp 15.000/pasang)</span>
+            </div>
+            <div class="layanan-item" id="item-bed-k" onclick="pilihLayanan('opt-bed-k')">
+                <input type="radio" name="laundry_service" id="opt-bed-k" value="15000" data-nama="Bedcover Kecil (Rp 15.000/pcs)" onchange="hitungTotal()">
+                <span>Bedcover Kecil (Rp 15.000/pcs)</span>
+            </div>
+            <div class="layanan-item" id="item-bed-s" onclick="pilihLayanan('opt-bed-s')">
+                <input type="radio" name="laundry_service" id="opt-bed-s" value="20000" data-nama="Bedcover Sedang (Rp 20.000/pcs)" onchange="hitungTotal()">
+                <span>Bedcover Sedang (Rp 20.000/pcs)</span>
+            </div>
+            <div class="layanan-item" id="item-bed-b" onclick="pilihLayanan('opt-bed-b')">
+                <input type="radio" name="laundry_service" id="opt-bed-b" value="25000" data-nama="Bedcover Besar (Rp 25.000/pcs)" onchange="hitungTotal()">
+                <span>Bedcover Besar (Rp 25.000/pcs)</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="quantity">Berat (Kg) / Jumlah (Pcs/Pasang) :</label>
+        <input type="number" id="quantity" placeholder="Masukkan berat/jumlah" min="1" value="" oninput="hitungTotal()">
+    </div>
+
+    <div class="form-group">
+        <label>Kecepatan / Durasi Layanan (Scroll ke bawah):</label>
+        <div class="scroll-container">
+            <div class="durasi-item" onclick="pilihDurasi('speed-reguler')">
+                <input type="radio" name="speed_service" id="speed-reguler" value="0" data-nama="Reguler (Normal - Tanpa Biaya Tambahan)" data-waktu="2 Hari" checked onchange="cekKecepatan()">
+                <span>Reguler (Normal - Tanpa Biaya Tambahan)</span>
+            </div>
+            <div class="durasi-item" onclick="pilihDurasi('speed-ekspres1')">
+                <input type="radio" name="speed_service" id="speed-ekspres1" value="8000" data-nama="Ekspres 1 Hari (+Rp 8.000)" data-waktu="1 Hari" onchange="cekKecepatan()">
+                <span>Ekspres 1 Hari (+Rp 8.000)</span>
+            </div>
+            <div class="durasi-item" onclick="pilihDurasi('speed-ekspres8h')">
+                <input type="radio" name="speed_service" id="speed-ekspres8h" value="12000" data-nama="Ekspres 8 Jam (+Rp 12.000)" data-waktu="8 Jam" onchange="cekKecepatan()">
+                <span>Ekspres 8 Jam (+Rp 12.000)</span>
+            </div>
+            <div class="durasi-item" onclick="pilihDurasi('speed-ekspres3h')">
+                <input type="radio" name="speed_service" id="speed-ekspres3h" value="20000" data-nama="Ekspres 3 Jam (+Rp 20.000)" data-waktu="3 Jam" onchange="cekKecepatan()">
+                <span>Ekspres 3 Jam (+Rp 20.000)</span>
+            </div>
+        </div>
+        <span class="info-estimasi" id="tampil-estimasi">⚠️ Estimasi Selesai: 2 Hari</span>
+    </div>
+
+    <div class="price-box">
+        <p>Total Biaya Laundry:</p>
+        <div class="total-harga" id="display-harga">Rp 0</div>
+    </div>
+
+    <button class="btn-order" onclick="kirimNota()">Kirim Perintah Kerja via WhatsApp</button>
+    <p class="note">*Pesanan otomatis disusun rapi untuk dikirimkan ke bagian pencuci.</p>
+</div>
+
+<script>
+    const NOMOR_LAUNDRY = "6281357673701"; 
+
+    // Fungsi pembantu klik area Layanan
+    function pilihLayanan(idRadio) {
+        const targetRadio = document.getElementById(idRadio);
+        if (!targetRadio.disabled) {
+            targetRadio.checked = true;
+            hitungTotal();
+        }
+    }
+
+    // Fungsi pembantu klik area Durasi
+    function pilihDurasi(idRadio) {
+        document.getElementById(idRadio).checked = true;
+        cekKecepatan();
+    }
+
+    function cekKecepatan() {
+        const durasiRadios = document.getElementsByName("speed_service");
+        let biayaEkspres = 0;
+        let estimasiWaktu = "2 Hari";
+
+        for (let i = 0; i < durasiRadios.length; i++) {
+            if (durasiRadios[i].checked) {
+                biayaEkspres = parseInt(durasiRadios[i].value);
+                estimasiWaktu = durasiRadios[i].getAttribute("data-waktu");
+                break;
+            }
+        }
+
+        const listIds = ['lipat', 'setrika', 'mukena', 'sepatu', 'bed-k', 'bed-s', 'bed-b'];
+        const tampilEstimasi = document.getElementById("tampil-estimasi");
+        tampilEstimasi.innerText = "⚠️ Estimasi Selesai: " + estimasiWaktu;
+
+        if (biayaEkspres > 0) {
+            // Kunci semua layanan khusus/satuan jika paket ekspres dipilih
+            listIds.forEach(id => {
+                document.getElementById('opt-' + id).disabled = true;
+                document.getElementById('item-' + id).classList.add('disabled');
+            });
+            // Otomatis pindah centang ke Cuci Komplit
+            document.getElementById('opt-cuci').checked = true;
+        } else {
+            // Buka kembali semua layanan jika kembali ke paket reguler
+            listIds.forEach(id => {
+                document.getElementById('opt-' + id).disabled = false;
+                document.getElementById('item-' + id).classList.remove('disabled');
+            });
+        }
+
+        hitungTotal();
+    }
+
+    function hitungTotal() {
+        const layananRadios = document.getElementsByName("laundry_service");
+        let hargaLayanan = 0;
+        for (let i = 0; i < layananRadios.length; i++) {
+            if (layananRadios[i].checked) {
+                hargaLayanan = parseInt(layananRadios[i].value);
+                break;
+            }
+        }
+
+        const durasiRadios = document.getElementsByName("speed_service");
+        let biayaEkspres = 0;
+        for (let i = 0; i < durasiRadios.length; i++) {
+            if (durasiRadios[i].checked) {
+                biayaEkspres = parseInt(durasiRadios[i].value);
+                break;
+            }
+        }
+
+        const qtyInput = document.getElementById("quantity").value;
+
+        if (qtyInput === "") {
+            document.getElementById("display-harga").innerText = "Rp 0";
+            return;
+        }
+
+        const qty = parseFloat(qtyInput) || 0;
+        const totalHarga = (hargaLayanan * qty) + biayaEkspres;
+        document.getElementById("display-harga").innerText = "Rp " + totalHarga.toLocaleString('id-ID');
+    }
+
+    function kirimNota() {
+        const nama = document.getElementById("customer-name").value.trim();
+        const qty = document.getElementById("quantity").value;
+        const totalHarga = document.getElementById("display-harga").innerText;
+
+        const layananRadios = document.getElementsByName("laundry_service");
+        let namaLayanan = "";
+        for (let i = 0; i < layananRadios.length; i++) {
+            if (layananRadios[i].checked) {
+                namaLayanan = layananRadios[i].getAttribute("data-nama");
+                break;
+            }
+        }
+
+        const durasiRadios = document.getElementsByName("speed_service");
+        let namaPaket = "";
+        let estimasiWaktu = "";
+        for (let i = 0; i < durasiRadios.length; i++) {
+            if (durasiRadios[i].checked) {
+                namaPaket = durasiRadios[i].getAttribute("data-nama");
+                estimasiWaktu = durasiRadios[i].getAttribute("data-waktu");
+                break;
+            }
+        }
+
+        if (nama === "") {
+            alert("Silakan masukkan nama pelanggan terlebih dahulu!");
+            return;
+        }
+        if (qty === "" || parseFloat(qty) <= 0) {
+            alert("Silakan masukkan jumlah berat/pcs yang valid!");
+            return;
+        }
+
+        const tgl = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+        const teksNota = `*PERINTAH KERJA LAUNDRY BARU*%0A` +
+                         `Tanggal Masuk: ${tgl}%0A%0A` +
+                         `Halo Tim Pencuci, harap segera diproses data laundry berikut:%0A%0A` +
+                         `- *Nama Pelanggan:* ${nama}%0A` +
+                         `- *Layanan:* ${namaLayanan}%0A` +
+                         `- *Jumlah/Berat:* ${qty}%0A` +
+                         `- *Durasi/Paket:* ${namaPaket}%0A` +
+                         `- *Target Selesai:* ${estimasiWaktu}%0A` +
+                         `- *TOTAL BIAYA:* *${totalHarga}*%0A%0A` +
+                         `*Catatan untuk Pencuci:* Harap kerjakan tepat waktu sesuai target durasi di atas ya. Semangat!`;
+
+        window.location.href = `https://wa.me/${6283177682707}?text=${teksNota}`;
+    }
+</script>
+
+</body>
+</html>
